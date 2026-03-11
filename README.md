@@ -11,11 +11,13 @@ The project is designed with a **modular service architecture**, allowing each t
 
 Currently implemented utilities:
 
-## Document Generators
+## Generators
 - CPF generator
 - CNPJ generator
 - CEP generator
 - Credit card generator
+- Random number generator
+- Number picker
 
 ## Validators
 - CPF validator
@@ -34,7 +36,7 @@ Currently implemented utilities:
 
 # Project Structure
 
-```
+```text
 src/
   core/
     utils/
@@ -45,17 +47,22 @@ src/
     cnpj/
     cep/
     credit-card/
+    random-number/
+    number-picker/
 
 scripts/
   cpf/
   cnpj/
   cep/
   credit-card/
+  random-number/
+  number-picker/
 
 tests/
+docs/
 ```
 
-The project separates **core utilities**, **services**, and **execution scripts**, making it easier to scale and maintain.
+The project separates **core utilities**, **services**, **execution scripts**, and **tool documentation**, making it easier to scale and maintain.
 
 ---
 
@@ -79,152 +86,170 @@ npm install
 
 Currently the utilities are accessed using **npm scripts** that execute the service layer directly.
 
+> Important: when passing flags to `npm run`, always use `--` before your custom flags.
+
+Example:
+
+```bash
+npm run number-picker:run -- --min 1 --max 100
+```
+
 ---
 
-# CPF
+# Quick Command Reference
 
-## Generate CPF
+## CPF
 
+Generate:
 ```bash
 npm run cpf:generate
 ```
 
-Formatted:
-
+Generate formatted:
 ```bash
 npm run cpf:generate -- --formatted
 ```
 
-## Validate CPF
-
+Validate:
 ```bash
 npm run cpf:validate -- 52998224725
 ```
 
+Detailed documentation:
+- [CPF overview](docs/CPF.md)
+
 ---
 
-# CNPJ
+## CNPJ
 
-## Generate CNPJ
-
+Generate:
 ```bash
 npm run cnpj:generate
 ```
 
-Formatted:
-
+Generate formatted:
 ```bash
 npm run cnpj:generate -- --formatted
 ```
 
-## Validate CNPJ
-
+Validate:
 ```bash
 npm run cnpj:validate -- 11444777000161
 ```
 
+Detailed documentation:
+- [CNPJ overview](docs/CNPJ.md)
+
 ---
 
-# CEP
+## CEP
 
-## Generate CEP
-
+Generate:
 ```bash
 npm run cep:generate
 ```
 
-Formatted:
-
+Generate formatted:
 ```bash
 npm run cep:generate -- --formatted
 ```
 
-## Validate CEP
-
+Validate:
 ```bash
 npm run cep:validate -- 86010190
 ```
 
+Detailed documentation:
+- [CEP overview](docs/CEP.md)
+
 ---
 
-# Credit Card
+## Credit Card
 
-The credit card module supports generation, validation and brand detection.
-
-Supported brands:
-
-- Visa
-- Mastercard
-- American Express
-- Elo
-
-## Generate Credit Card
-
-Generate a Visa card:
-
+Generate:
 ```bash
 npm run credit-card:generate -- --brand visa
 ```
 
-Generate an Amex card:
-
+Generate formatted:
 ```bash
-npm run credit-card:generate -- --brand amex
+npm run credit-card:generate -- --brand amex --formatted
 ```
 
-Formatted output:
-
-```bash
-npm run credit-card:generate -- --brand visa --formatted
-```
-
-Example output:
-
-```
-{
-  brand: 'visa',
-  number: '4111 1111 1111 1111',
-  expiryMonth: '08',
-  expiryYear: '28',
-  expiry: '08/28',
-  cvv: '123'
-}
-```
-
----
-
-## Detect Credit Card Brand
-
+Detect brand:
 ```bash
 npm run credit-card:detect -- 4111111111111111
 ```
 
-Output:
-
-```
-visa
-```
-
----
-
-## Validate Credit Card
-
+Validate:
 ```bash
 npm run credit-card:validate -- --number 4111111111111111 --expiry 12/30 --cvv 123
 ```
 
-Example result:
+Detailed documentation:
+- [Credit card overview](docs/CREDIT_CARD.md)
 
+---
+
+## Random Number
+
+Generate one random number:
+```bash
+npm run random-number:generate
 ```
-{
-  isValid: true,
-  brand: 'visa',
-  number: '4111111111111111',
-  numberValid: true,
-  expiryValid: true,
-  cvvValid: true
-}
+
+Generate numbers in a range:
+```bash
+npm run random-number:generate -- --min 1 --max 100 --count 10
 ```
+
+Generate sorted values:
+```bash
+npm run random-number:generate -- --min 1 --max 100 --count 10 --sorted
+```
+
+Generate unique values:
+```bash
+npm run random-number:generate -- --min 1 --max 100 --count 10 --unique
+```
+
+Format output as JSON:
+```bash
+npm run random-number:generate -- --min 1 --max 100 --count 10 --format json
+```
+
+Detailed documentation:
+- [Random number overview](docs/RANDOM_NUMBER.md)
+
+---
+
+## Number Picker
+
+Pick one number with defaults:
+```bash
+npm run number-picker:run
+```
+
+Pick one number in a range:
+```bash
+npm run number-picker:run -- --min 1 --max 100
+```
+
+Detailed documentation:
+- [Number picker overview](docs/NUMBER_PICKER.md)
+
+---
+
+# Documentation Index
+
+Detailed command and flag documentation is available in the `docs/` folder:
+
+- [CPF](docs/CPF.md)
+- [CNPJ](docs/CNPJ.md)
+- [CEP](docs/CEP.md)
+- [Credit Card](docs/CREDIT_CARD.md)
+- [Random Number](docs/RANDOM_NUMBER.md)
+- [Number Picker](docs/NUMBER_PICKER.md)
 
 ---
 

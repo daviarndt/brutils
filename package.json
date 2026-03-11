@@ -25,7 +25,9 @@
     "cep:validate": "tsx scripts/cep/validate.ts",
     "credit-card:generate": "tsx scripts/credit-card/generate.ts",
     "credit-card:validate": "tsx scripts/credit-card/validate.ts",
-    "credit-card:detect": "tsx scripts/credit-card/detect.ts"
+    "credit-card:detect": "tsx scripts/credit-card/detect.ts",
+    "random-number:generate": "tsx scripts/random-number/generate.ts",
+    "number-picker:run": "tsx scripts/number-picker/run.ts"
   },
   "engines": {
     "node": ">=18"
