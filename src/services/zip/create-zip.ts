@@ -9,8 +9,14 @@ import type { ZipCommandOptions, ZipExecutionPlan } from "./zip.types.js";
 function resolveCompressionLevel(level?: number): number {
   const resolvedLevel = level ?? 9;
 
-  if (!Number.isInteger(resolvedLevel) || resolvedLevel < 0 || resolvedLevel > 9) {
-    throw new BRUtilsError("Compression level must be an integer between 0 and 9.");
+  if (
+    !Number.isInteger(resolvedLevel) ||
+    resolvedLevel < 0 ||
+    resolvedLevel > 9
+  ) {
+    throw new BRUtilsError(
+      "Compression level must be an integer between 0 and 9."
+    );
   }
 
   return resolvedLevel;
@@ -79,16 +85,16 @@ export async function createZip(
     const inputs = collectZipInputs(plan.sourcePath, plan.outputPath, options);
 
     for (const input of inputs) {
-  if (options.verbose && !options.quiet) {
-    console.log(`[zip] adding ${input.entryName}`);
-  }
+      if (options.verbose && !options.quiet) {
+        console.log(`[zip] adding ${input.entryName}`);
+      }
 
-  if (input.type === "directory") {
-    archive.directory(input.sourcePath, input.entryName);
-  } else {
-    archive.file(input.sourcePath, { name: input.entryName });
-  }
-}
+      if (input.type === "directory") {
+        archive.directory(input.sourcePath, input.entryName);
+      } else {
+        archive.file(input.sourcePath, { name: input.entryName });
+      }
+    }
 
     archive.finalize().catch(reject);
   });

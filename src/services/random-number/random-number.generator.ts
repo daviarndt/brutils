@@ -28,7 +28,9 @@ export function generateRandomNumbers(
   }
 
   if (min > max) {
-    throw new BRUtilsError("Minimum value cannot be greater than maximum value.");
+    throw new BRUtilsError(
+      "Minimum value cannot be greater than maximum value."
+    );
   }
 
   if (!Number.isInteger(count) || count < 1) {
@@ -45,12 +47,17 @@ export function generateRandomNumbers(
 
   let result: number[];
 
- if (unique) {
-  const pool = Array.from({ length: availableNumbers }, (_, index) => min + index);
-  result = shuffleArray(pool).slice(0, count);
-} else {
-  result = Array.from({ length: count }, () => randomIntegerBetween(min, max));
-}
+  if (unique) {
+    const pool = Array.from(
+      { length: availableNumbers },
+      (_, index) => min + index
+    );
+    result = shuffleArray(pool).slice(0, count);
+  } else {
+    result = Array.from({ length: count }, () =>
+      randomIntegerBetween(min, max)
+    );
+  }
 
   if (sorted) {
     result.sort((a, b) => a - b);

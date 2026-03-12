@@ -16,14 +16,14 @@ npm run random-number:generate
 
 ## Flags
 
-| Flag | Type | Required | Description | Example |
-|---|---|---|---|---|
-| `--min` | integer | No | Optional minimum value. | `npm run random-number:generate -- --min 1` |
-| `--max` | integer | No | Optional maximum value. | `npm run random-number:generate -- --max 100` |
-| `--count` | integer | No | Number of values to generate. | `npm run random-number:generate -- --min 1 --max 100 --count 10` |
-| `--sorted` | boolean | No | Sorts the output in ascending order. | `npm run random-number:generate -- --min 1 --max 100 --count 10 --sorted` |
-| `--unique` | boolean | No | Forces unique values. | `npm run random-number:generate -- --min 1 --max 100 --count 10 --unique` |
-| `--format` | string | No | Controls output formatting. | `plain`, `json`, `csv` |
+| Flag       | Type    | Required | Description                          | Example                                                                   |
+| ---------- | ------- | -------- | ------------------------------------ | ------------------------------------------------------------------------- |
+| `--min`    | integer | No       | Optional minimum value.              | `npm run random-number:generate -- --min 1`                               |
+| `--max`    | integer | No       | Optional maximum value.              | `npm run random-number:generate -- --max 100`                             |
+| `--count`  | integer | No       | Number of values to generate.        | `npm run random-number:generate -- --min 1 --max 100 --count 10`          |
+| `--sorted` | boolean | No       | Sorts the output in ascending order. | `npm run random-number:generate -- --min 1 --max 100 --count 10 --sorted` |
+| `--unique` | boolean | No       | Forces unique values.                | `npm run random-number:generate -- --min 1 --max 100 --count 10 --unique` |
+| `--format` | string  | No       | Controls output formatting.          | `plain`, `json`, `csv`                                                    |
 
 ## Combined examples
 

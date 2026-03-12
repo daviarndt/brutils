@@ -88,7 +88,9 @@ function isValidCVV(brand: string, cvv?: string): boolean {
   }
 
   const expectedLength =
-    CREDIT_CARD_BRAND_CVV_LENGTH[brand as keyof typeof CREDIT_CARD_BRAND_CVV_LENGTH];
+    CREDIT_CARD_BRAND_CVV_LENGTH[
+      brand as keyof typeof CREDIT_CARD_BRAND_CVV_LENGTH
+    ];
 
   return digits.length === expectedLength;
 }

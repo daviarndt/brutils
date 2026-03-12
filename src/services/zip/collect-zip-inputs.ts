@@ -66,7 +66,9 @@ export function collectZipInputs(
       }
 
       return {
-        type: fs.statSync(absoluteEntryPath).isDirectory() ? "directory" : "file",
+        type: fs.statSync(absoluteEntryPath).isDirectory()
+          ? "directory"
+          : "file",
         sourcePath: absoluteEntryPath,
         entryName: entry
       };

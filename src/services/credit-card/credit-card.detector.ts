@@ -5,7 +5,9 @@ import {
 } from "./credit-card.constants.js";
 import type { CreditCardBrand } from "./credit-card.types.js";
 
-export function detectCreditCardBrand(number: string): CreditCardBrand | "unknown" {
+export function detectCreditCardBrand(
+  number: string
+): CreditCardBrand | "unknown" {
   const digits = onlyDigits(number);
 
   const brands = Object.keys(CREDIT_CARD_BRAND_PREFIXES) as CreditCardBrand[];

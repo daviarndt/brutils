@@ -22,10 +22,10 @@ npm run number-picker:run -- --min 1 --max 100
 
 ## Flags
 
-| Flag | Type | Required | Description | Example |
-|---|---|---|---|---|
-| `--min` | integer | No | Optional minimum value. | `npm run number-picker:run -- --min 1` |
-| `--max` | integer | No | Optional maximum value. | `npm run number-picker:run -- --max 100` |
+| Flag    | Type    | Required | Description             | Example                                  |
+| ------- | ------- | -------- | ----------------------- | ---------------------------------------- |
+| `--min` | integer | No       | Optional minimum value. | `npm run number-picker:run -- --min 1`   |
+| `--max` | integer | No       | Optional maximum value. | `npm run number-picker:run -- --max 100` |
 
 ## Notes
 

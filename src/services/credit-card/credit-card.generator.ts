@@ -17,7 +17,9 @@ function generateRandomNumericString(length: number): string {
 }
 
 function formatCreditCardNumber(value: string): string {
-  return onlyDigits(value).replace(/(\d{4})(?=\d)/g, "$1 ").trim();
+  return onlyDigits(value)
+    .replace(/(\d{4})(?=\d)/g, "$1 ")
+    .trim();
 }
 
 function calculateLuhnCheckDigit(partialNumber: string): number {
@@ -58,7 +60,9 @@ function generateExpiry(expiryYearsAhead = 5): {
   const now = new Date();
   const month = String(Math.floor(Math.random() * 12) + 1).padStart(2, "0");
   const futureYear =
-    now.getFullYear() + Math.floor(Math.random() * Math.max(expiryYearsAhead, 1)) + 1;
+    now.getFullYear() +
+    Math.floor(Math.random() * Math.max(expiryYearsAhead, 1)) +
+    1;
 
   const yearTwoDigits = String(futureYear).slice(-2);
 
@@ -79,7 +83,9 @@ export function generateCreditCard(
 ): CreditCardData {
   const brand = options.brand ?? "visa";
   const rawNumber = generateCardNumber(brand);
-  const number = options.formatted ? formatCreditCardNumber(rawNumber) : rawNumber;
+  const number = options.formatted
+    ? formatCreditCardNumber(rawNumber)
+    : rawNumber;
   const { expiryMonth, expiryYear, expiry } = generateExpiry(
     options.expiryYearsAhead
   );

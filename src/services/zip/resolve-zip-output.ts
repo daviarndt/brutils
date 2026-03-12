@@ -1,6 +1,9 @@
 import path from "node:path";
 
-export function resolveZipOutputPath(sourcePath: string, explicitOut?: string): string {
+export function resolveZipOutputPath(
+  sourcePath: string,
+  explicitOut?: string
+): string {
   if (explicitOut) {
     return explicitOut;
   }

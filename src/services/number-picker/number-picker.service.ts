@@ -18,7 +18,9 @@ export function pickRandomNumber(options: NumberPickerOptions = {}): number {
   }
 
   if (min > max) {
-    throw new BRUtilsError("Minimum value cannot be greater than maximum value.");
+    throw new BRUtilsError(
+      "Minimum value cannot be greater than maximum value."
+    );
   }
 
   return Math.floor(Math.random() * (max - min + 1)) + min;

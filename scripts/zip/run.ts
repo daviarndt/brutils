@@ -41,7 +41,14 @@ function parseOptionalInteger(value?: string): number | undefined {
 async function main(): Promise<void> {
   const positionalArgs = process.argv.slice(2).filter((arg, index, array) => {
     const previous = array[index - 1];
-    if (previous === "--out" || previous === "-o" || previous === "--level" || previous === "-l" || previous === "--exclude" || previous === "-x") {
+    if (
+      previous === "--out" ||
+      previous === "-o" ||
+      previous === "--level" ||
+      previous === "-l" ||
+      previous === "--exclude" ||
+      previous === "-x"
+    ) {
       return false;
     }
 

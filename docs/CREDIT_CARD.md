@@ -41,18 +41,18 @@ npm run credit-card:validate -- --number 4111111111111111 --expiry 12/30 --cvv 1
 
 ### Generate command flags
 
-| Flag | Command | Type | Required | Description | Accepted values / Example |
-|---|---|---|---|---|---|
-| `--brand` | `credit-card:generate` | string | No | Selects the card brand to generate. | `visa`, `mastercard`, `amex`, `elo` |
-| `--formatted` | `credit-card:generate` | boolean | No | Formats the generated card number with spaces. | `npm run credit-card:generate -- --brand visa --formatted` |
+| Flag          | Command                | Type    | Required | Description                                    | Accepted values / Example                                  |
+| ------------- | ---------------------- | ------- | -------- | ---------------------------------------------- | ---------------------------------------------------------- |
+| `--brand`     | `credit-card:generate` | string  | No       | Selects the card brand to generate.            | `visa`, `mastercard`, `amex`, `elo`                        |
+| `--formatted` | `credit-card:generate` | boolean | No       | Formats the generated card number with spaces. | `npm run credit-card:generate -- --brand visa --formatted` |
 
 ### Validate command flags
 
-| Flag | Command | Type | Required | Description | Example |
-|---|---|---|---|---|---|
-| `--number` | `credit-card:validate` | string | Yes | The credit card number to validate. | `--number 4111111111111111` |
-| `--expiry` | `credit-card:validate` | string | Yes | The expiry date in `MM/YY` format. | `--expiry 12/30` |
-| `--cvv` | `credit-card:validate` | string | Yes | The CVV code. | `--cvv 123` |
+| Flag       | Command                | Type   | Required | Description                         | Example                     |
+| ---------- | ---------------------- | ------ | -------- | ----------------------------------- | --------------------------- |
+| `--number` | `credit-card:validate` | string | Yes      | The credit card number to validate. | `--number 4111111111111111` |
+| `--expiry` | `credit-card:validate` | string | Yes      | The expiry date in `MM/YY` format.  | `--expiry 12/30`            |
+| `--cvv`    | `credit-card:validate` | string | Yes      | The CVV code.                       | `--cvv 123`                 |
 
 ## Output example
 
