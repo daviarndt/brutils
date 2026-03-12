@@ -2,19 +2,13 @@
 
 ## Overview
 
-The number picker module selects one random integer.
+The number picker module selects one random integer from a numeric range.
 
-If no flags are provided, the command uses the service defaults.
+This module remains available for backwards compatibility and now supports `--seed` for reproducible picks.
 
-## Available Command
+## Available Commands
 
 ### Pick one number
-
-```bash
-npm run number-picker:run
-```
-
-### Pick one number in a range
 
 ```bash
 npm run number-picker:run -- --min 1 --max 100
@@ -22,12 +16,13 @@ npm run number-picker:run -- --min 1 --max 100
 
 ## Flags
 
-| Flag    | Type    | Required | Description             | Example                                  |
-| ------- | ------- | -------- | ----------------------- | ---------------------------------------- |
-| `--min` | integer | No       | Optional minimum value. | `npm run number-picker:run -- --min 1`   |
-| `--max` | integer | No       | Optional maximum value. | `npm run number-picker:run -- --max 100` |
+| Flag         | Type    | Required | Description                    | Example                                                    |
+| ------------ | ------- | -------- | ------------------------------ | ---------------------------------------------------------- |
+| `--min <n>`  | integer | No       | Optional minimum value.        | `npm run number-picker:run -- --min 1`                     |
+| `--max <n>`  | integer | No       | Optional maximum value.        | `npm run number-picker:run -- --max 100`                   |
+| `--seed <n>` | integer | No       | Makes the result reproducible. | `npm run number-picker:run -- --min 1 --max 100 --seed 42` |
 
 ## Notes
 
 - The command returns a single integer.
-- The current implementation works with integers only.
+- For the broader random utilities group, also see `RANDOM_NUMBER.md`.

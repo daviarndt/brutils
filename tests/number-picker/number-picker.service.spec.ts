@@ -5,7 +5,8 @@ describe("pickRandomNumber", () => {
   it("should generate a number within the provided range", () => {
     const result = pickRandomNumber({
       min: 1,
-      max: 100
+      max: 100,
+      seed: 50
     });
 
     expect(result).toBeGreaterThanOrEqual(1);
@@ -15,10 +16,17 @@ describe("pickRandomNumber", () => {
   it("should generate an integer", () => {
     const result = pickRandomNumber({
       min: 1,
-      max: 100
+      max: 100,
+      seed: 12
     });
 
     expect(Number.isInteger(result)).toBe(true);
+  });
+
+  it("should be deterministic when a seed is provided", () => {
+    expect(pickRandomNumber({ min: 1, max: 100, seed: 9 })).toBe(
+      pickRandomNumber({ min: 1, max: 100, seed: 9 })
+    );
   });
 
   it("should throw when min is greater than max", () => {

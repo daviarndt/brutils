@@ -1,4 +1,5 @@
 import { BRUtilsError } from "../../core/errors/brutils.error.js";
+import { createRandomSource } from "../../core/utils/seeded-random.js";
 import type { NumberPickerOptions } from "./number-picker.types.js";
 
 function resolveMin(min?: number): number {
@@ -12,6 +13,7 @@ function resolveMax(max?: number): number {
 export function pickRandomNumber(options: NumberPickerOptions = {}): number {
   const min = resolveMin(options.min);
   const max = resolveMax(options.max);
+  const randomSource = createRandomSource(options.seed);
 
   if (!Number.isInteger(min) || !Number.isInteger(max)) {
     throw new BRUtilsError("Minimum and maximum values must be integers.");
@@ -23,5 +25,5 @@ export function pickRandomNumber(options: NumberPickerOptions = {}): number {
     );
   }
 
-  return Math.floor(Math.random() * (max - min + 1)) + min;
+  return Math.floor(randomSource() * (max - min + 1)) + min;
 }

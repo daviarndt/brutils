@@ -1,9 +1,9 @@
 import fs from "node:fs";
 import path from "node:path";
 import archiver from "archiver";
-import { BRUtilsError } from "../../core/errors/brutils.error.js";
 import { collectZipInputs } from "./collect-zip-inputs.js";
 import { resolveZipOutputPath } from "./resolve-zip-output.js";
+import { BRUtilsError } from "../../core/errors/brutils.error.js";
 import type { ZipCommandOptions, ZipExecutionPlan } from "./zip.types.js";
 
 function resolveCompressionLevel(level?: number): number {
@@ -55,7 +55,9 @@ export function createZipExecutionPlan(
     sourceType: getSourceType(path.resolve(sourcePath)),
     exclude: options.exclude ?? [],
     contentsOnly: options.contentsOnly ?? false,
-    level: resolveCompressionLevel(options.level)
+    level: resolveCompressionLevel(options.level),
+    followSymlinks: options.followSymlinks ?? false,
+    store: options.store ?? false
   };
 }
 
@@ -74,7 +76,8 @@ export async function createZip(
 
   const outputStream = fs.createWriteStream(plan.outputPath);
   const archive = archiver("zip", {
-    zlib: { level: plan.level }
+    zlib: { level: plan.store ? 0 : plan.level },
+    store: plan.store
   });
 
   await new Promise<void>((resolve, reject) => {
@@ -90,7 +93,7 @@ export async function createZip(
       }
 
       if (input.type === "directory") {
-        archive.directory(input.sourcePath, input.entryName);
+        archive.append("", { name: input.entryName });
       } else {
         archive.file(input.sourcePath, { name: input.entryName });
       }

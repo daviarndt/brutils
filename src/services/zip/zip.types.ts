@@ -1,3 +1,8 @@
+import type {
+  ZipArchiveEntryInfo,
+  ZipTestResult
+} from "../archive/zip-archive.types.js";
+
 export interface ZipCommandOptions {
   out?: string;
   level?: number;
@@ -7,6 +12,8 @@ export interface ZipCommandOptions {
   dryRun?: boolean;
   verbose?: boolean;
   quiet?: boolean;
+  followSymlinks?: boolean;
+  store?: boolean;
 }
 
 export interface ZipExecutionPlan {
@@ -16,6 +23,8 @@ export interface ZipExecutionPlan {
   exclude: string[];
   contentsOnly: boolean;
   level: number;
+  followSymlinks: boolean;
+  store: boolean;
 }
 
 export interface ZipInputEntry {
@@ -23,3 +32,6 @@ export interface ZipInputEntry {
   sourcePath: string;
   entryName: string;
 }
+
+export type ZipListResult = ZipArchiveEntryInfo[];
+export type ZipTestExecutionResult = ZipTestResult;

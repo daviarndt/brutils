@@ -4,6 +4,10 @@ import fg from "fast-glob";
 import { BRUtilsError } from "../../core/errors/brutils.error.js";
 import type { ZipCommandOptions, ZipInputEntry } from "./zip.types.js";
 
+function normalizeEntryName(value: string): string {
+  return value.replace(/\\/g, "/");
+}
+
 function isDirectory(sourcePath: string): boolean {
   return fs.statSync(sourcePath).isDirectory();
 }
@@ -37,40 +41,55 @@ export function collectZipInputs(
     throw new BRUtilsError(`Unsupported source type: ${sourcePath}`);
   }
 
-  if (!options.contentsOnly) {
-    return [
-      {
-        type: "directory",
-        sourcePath: resolvedSource,
-        entryName: path.basename(resolvedSource)
-      }
-    ];
-  }
-
   const excludePatterns = options.exclude ?? [];
   const outputAbsolutePath = path.resolve(outputPath);
-
-  const entries = fg.sync(["**/*"], {
+  const rootEntryName = path.basename(resolvedSource);
+  const entries = fg.sync(["**/*", "**/.*"], {
     cwd: resolvedSource,
     onlyFiles: false,
+    onlyDirectories: false,
     dot: true,
-    ignore: excludePatterns
+    followSymbolicLinks: options.followSymlinks ?? false,
+    unique: true,
+    ignore: excludePatterns,
+    markDirectories: true
   });
+
+  if (entries.length === 0) {
+    return options.contentsOnly
+      ? []
+      : [
+          {
+            type: "directory",
+            sourcePath: resolvedSource,
+            entryName: `${rootEntryName}/`
+          }
+        ];
+  }
 
   return entries
     .map<ZipInputEntry | null>((entry) => {
-      const absoluteEntryPath = path.join(resolvedSource, entry);
+      const cleanedEntry = entry.endsWith("/") ? entry.slice(0, -1) : entry;
+      const absoluteEntryPath = path.join(resolvedSource, cleanedEntry);
 
       if (path.resolve(absoluteEntryPath) === outputAbsolutePath) {
         return null;
       }
 
+      const relativeEntryName = options.contentsOnly
+        ? cleanedEntry
+        : path.join(rootEntryName, cleanedEntry);
+
+      const entryType = entry.endsWith("/") ? "directory" : "file";
+
       return {
-        type: fs.statSync(absoluteEntryPath).isDirectory()
-          ? "directory"
-          : "file",
+        type: entryType,
         sourcePath: absoluteEntryPath,
-        entryName: entry
+        entryName: normalizeEntryName(
+          entryType === "directory"
+            ? `${relativeEntryName}/`
+            : relativeEntryName
+        )
       };
     })
     .filter((entry): entry is ZipInputEntry => entry !== null);

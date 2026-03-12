@@ -38,15 +38,35 @@
     "cnpj:mask": "tsx scripts/cnpj/mask.ts",
     "cep:format": "tsx scripts/cep/format.ts",
     "cep:strip": "tsx scripts/cep/strip.ts",
-    "cep:mask": "tsx scripts/cep/mask.ts"
+    "cep:mask": "tsx scripts/cep/mask.ts",
+    "random-number:int": "tsx scripts/random-number/int.ts",
+    "random-number:float": "tsx scripts/random-number/float.ts",
+    "random-number:pick": "tsx scripts/random-number/pick.ts",
+    "random-number:shuffle": "tsx scripts/random-number/shuffle.ts",
+    "random-number:dice": "tsx scripts/random-number/dice.ts",
+    "random-number:coin": "tsx scripts/random-number/coin.ts",
+    "random-number:pick-number": "tsx scripts/number-picker/run.ts",
+    "zip:create": "tsx scripts/zip/create.ts",
+    "zip:list": "tsx scripts/zip/list.ts",
+    "zip:test": "tsx scripts/zip/test.ts",
+    "unzip:extract": "tsx scripts/unzip/extract.ts",
+    "unzip:list": "tsx scripts/unzip/list.ts",
+    "unzip:test": "tsx scripts/unzip/test.ts"
   },
   "engines": {
     "node": ">=18"
   },
+  "dependencies": {
+    "archiver": "^7.0.1",
+    "extract-zip": "^2.0.1",
+    "fast-glob": "^3.3.3",
+    "minimatch": "^3.1.5",
+    "yauzl": "^2.10.0"
+  },
   "devDependencies": {
-    "@eslint/js": "^9.20.0",
     "@types/archiver": "^7.0.0",
     "@types/node": "^24.0.0",
+    "@types/yauzl": "^2.10.3",
     "eslint": "^9.20.1",
     "prettier": "^3.5.0",
     "tsup": "^8.4.0",
@@ -54,10 +74,5 @@
     "typescript": "^5.8.0",
     "typescript-eslint": "^8.24.0",
     "vitest": "^3.0.0"
-  },
-  "dependencies": {
-    "archiver": "^7.0.1",
-    "extract-zip": "^2.0.1",
-    "fast-glob": "^3.3.3"
   }
 }

@@ -1,30 +1,15 @@
-import { pickRandomNumber } from "../../src/services/number-picker/number-picker.service.js";
+import { pickRandomNumber } from "../../src/services/number-picker/index.js";
+import { getArgValue, parseOptionalInteger } from "../shared/cli.js";
 
-function getArgValue(flag: string): string | undefined {
-  const index = process.argv.indexOf(flag);
-  return index !== -1 ? process.argv[index + 1] : undefined;
-}
-
-function parseOptionalInteger(value?: string): number | undefined {
-  if (value === undefined) {
-    return undefined;
-  }
-
-  const parsed = Number(value);
-
-  if (!Number.isInteger(parsed)) {
-    throw new Error(`Invalid integer value: ${value}`);
-  }
-
-  return parsed;
-}
-
-const min = parseOptionalInteger(getArgValue("--min"));
-const max = parseOptionalInteger(getArgValue("--max"));
+const argv = process.argv.slice(2);
+const min = parseOptionalInteger(getArgValue(argv, "--min"));
+const max = parseOptionalInteger(getArgValue(argv, "--max"));
+const seed = parseOptionalInteger(getArgValue(argv, "--seed"));
 
 const result = pickRandomNumber({
   min,
-  max
+  max,
+  seed
 });
 
 console.log(result);
