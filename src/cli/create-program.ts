@@ -8,7 +8,7 @@ import { registerTextDataCommands } from "./commands/register-text-data.js";
 import { rootFooter } from "./shared/help.js";
 import { configureProgramUi } from "./ui/output.js";
 
-const CLI_VERSION = "1.0.0";
+const CLI_VERSION = "1.0.1";
 
 export function buildProgram(): Command {
   const program = new Command();

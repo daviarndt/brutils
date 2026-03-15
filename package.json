@@ -1,6 +1,6 @@
 {
   "name": "@danielarndt0/brutils-cli",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Production-ready CLI for Brazilian and general developer utilities.",
   "type": "module",
   "main": "./dist/index.js",
