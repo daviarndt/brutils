@@ -6,3 +6,5 @@ export * from "./random-number/index.js";
 export * from "./number-picker/index.js";
 export * from "./zip/index.js";
 export * from "./unzip/index.js";
+export * from "./str/index.js";
+export * from "./json/index.js";

@@ -43,6 +43,35 @@ import {
   shuffleRandomItems
 } from "./services/random-number/index.js";
 import { pickRandomNumber } from "./services/number-picker/index.js";
+import {
+  convertStringCase,
+  extractText,
+  normalizeText,
+  padText,
+  removeAccents,
+  replaceText,
+  slugifyText,
+  transformBase64,
+  transformHtmlEntities,
+  transformUrlEncoding,
+  trimText,
+  truncateText,
+  type StringCaseStyle,
+  type StringCodecMode,
+  type StringPadSide
+} from "./services/str/index.js";
+import {
+  convertJsonToYaml,
+  deleteJsonPathValue,
+  diffJsonValues,
+  formatJsonValue,
+  getJsonPathValue,
+  mergeJsonValues,
+  minifyJsonValue,
+  parseJsonInput,
+  setJsonPathValue,
+  validateJsonInput
+} from "./services/json/index.js";
 import { createZip, listZip, testZip } from "./services/zip/index.js";
 import {
   extractZipFile,
@@ -83,7 +112,22 @@ const BRAZILIAN_STATES = [
 const CARD_BRANDS = ["visa", "mastercard", "amex", "elo"] as const;
 const RANDOM_OUTPUT_FORMATS = ["plain", "json", "csv"] as const;
 
+const STRING_CASE_STYLES = [
+  "camel",
+  "snake",
+  "kebab",
+  "pascal",
+  "constant",
+  "title"
+] as const;
+const STRING_CODEC_MODES = ["encode", "decode"] as const;
+const STRING_PAD_SIDES = ["left", "right", "both"] as const;
+
 type RandomOutputFormat = (typeof RANDOM_OUTPUT_FORMATS)[number];
+
+type StringCaseStyleOption = (typeof STRING_CASE_STYLES)[number];
+type StringCodecModeOption = (typeof STRING_CODEC_MODES)[number];
+type StringPadSideOption = (typeof STRING_PAD_SIDES)[number];
 
 function parseInteger(value: string): number {
   const parsed = Number(value);
@@ -151,6 +195,128 @@ function parseRandomFormat(value: string): RandomOutputFormat {
   }
 
   return normalized as RandomOutputFormat;
+}
+
+function parseStringCaseStyle(value: string): StringCaseStyle {
+  const normalized = value.toLowerCase();
+
+  if (!STRING_CASE_STYLES.includes(normalized as StringCaseStyleOption)) {
+    throw new Error(
+      `Invalid string case style "${value}". Use one of: ${STRING_CASE_STYLES.join(", ")}.`
+    );
+  }
+
+  return normalized as StringCaseStyle;
+}
+
+function parseStringCodecMode(value: string): StringCodecMode {
+  const normalized = value.toLowerCase();
+
+  if (!STRING_CODEC_MODES.includes(normalized as StringCodecModeOption)) {
+    throw new Error(
+      `Invalid codec mode "${value}". Use one of: ${STRING_CODEC_MODES.join(", ")}.`
+    );
+  }
+
+  return normalized as StringCodecMode;
+}
+
+function parseStringPadSide(value: string): StringPadSide {
+  const normalized = value.toLowerCase();
+
+  if (!STRING_PAD_SIDES.includes(normalized as StringPadSideOption)) {
+    throw new Error(
+      `Invalid pad side "${value}". Use one of: ${STRING_PAD_SIDES.join(", ")}.`
+    );
+  }
+
+  return normalized as StringPadSide;
+}
+
+function readTextSource(options: { text?: string; file?: string }): string {
+  if (options.text && options.file) {
+    throw new Error("Use either --text or --file, not both.");
+  }
+
+  if (options.text !== undefined) {
+    return options.text;
+  }
+
+  if (options.file) {
+    return fs.readFileSync(options.file, "utf-8");
+  }
+
+  throw new Error("One of --text or --file is required.");
+}
+
+function normalizeStringList(value?: string | string[]): string[] {
+  if (value === undefined) {
+    return [];
+  }
+
+  return Array.isArray(value) ? value : [value];
+}
+
+function readSingleJsonSource(options: { file?: string; value?: string }): {
+  sourcePath?: string;
+  raw: string;
+  parsed: unknown;
+} {
+  if (options.file && options.value) {
+    throw new Error("Use either --file or --value, not both.");
+  }
+
+  if (options.file) {
+    const raw = fs.readFileSync(options.file, "utf-8");
+    return {
+      sourcePath: options.file,
+      raw,
+      parsed: parseJsonInput(raw)
+    };
+  }
+
+  if (options.value !== undefined) {
+    return {
+      raw: options.value,
+      parsed: parseJsonInput(options.value)
+    };
+  }
+
+  throw new Error("One of --file or --value is required.");
+}
+
+function readMultipleJsonSources(options: {
+  file?: string | string[];
+  value?: string | string[];
+}): unknown[] {
+  const fileValues = normalizeStringList(options.file);
+  const inlineValues = normalizeStringList(options.value);
+
+  if (fileValues.length + inlineValues.length < 2) {
+    throw new Error(
+      "Provide at least two JSON sources via --file and/or --value."
+    );
+  }
+
+  return [
+    ...fileValues.map((filePath) => {
+      const raw = fs.readFileSync(filePath, "utf-8");
+      return parseJsonInput(raw);
+    }),
+    ...inlineValues.map((value) => parseJsonInput(value))
+  ];
+}
+
+function readDiffJsonSource(value: string): unknown {
+  if (fs.existsSync(value) && fs.statSync(value).isFile()) {
+    return parseJsonInput(fs.readFileSync(value, "utf-8"));
+  }
+
+  return parseJsonInput(value);
+}
+
+function writeTextFile(pathValue: string, content: string): void {
+  fs.writeFileSync(pathValue, content, "utf-8");
 }
 
 function readItems(items?: string, file?: string): string[] {
@@ -236,7 +402,7 @@ const program = new Command();
 program
   .name("brutils")
   .description("Core Brazilian developer utilities CLI.")
-  .version("0.1.0")
+  .version("0.3.0")
   .showHelpAfterError("(use --help for detailed usage)")
   .showSuggestionAfterError(true)
   .addHelpText(
@@ -248,6 +414,8 @@ Examples:
   brutils cnpj generate --formatted --count 5 --unique
   brutils cep mask 86010190 --mask "###**-***"
   brutils credit-card generate --brand visa --formatted
+  brutils str slug --text "Olá Mundo Legal"
+  brutils json format --file ./config.json --sort-keys
   brutils random-number int --min 1 --max 60 --count 6 --unique --sorted
   brutils number-picker run --min 1 --max 60 --seed 42
   brutils zip create ./folder --out ./backup.zip --force
@@ -599,6 +767,453 @@ creditCard
   .description("Detect the card brand from a card number.")
   .action((number: string) => {
     printValue(detectCreditCardBrand(number));
+  });
+
+const str = program
+  .command("str")
+  .description("String transformations and encoding helpers.")
+  .addHelpText(
+    "after",
+    `
+Examples:
+  brutils str slug --text "Olá Mundo Legal"
+  brutils str case --text "minha variavel legal" --to camel
+  brutils str truncate --text "hello world" --max 8 --suffix "..."
+  brutils str replace --text "hello 123" --from "\\d+" --with "X" --regex
+  brutils str extract "\\[(.*?)\\]" --text "[one] [two]" --regex
+  brutils str base64 --text "hello" --mode encode
+`
+  );
+
+str
+  .command("slug")
+  .description("Convert text to a URL-friendly slug.")
+  .option("--text <value>", "Inline text input.")
+  .option("--file <path>", "Read input text from a file.")
+  .action((options: { text?: string; file?: string }) => {
+    printValue(slugifyText(readTextSource(options)));
+  });
+
+str
+  .command("case")
+  .description("Convert text between casing styles.")
+  .option("--text <value>", "Inline text input.")
+  .option("--file <path>", "Read input text from a file.")
+  .requiredOption(
+    "--to <style>",
+    "Target style: camel, snake, kebab, pascal, constant or title.",
+    parseStringCaseStyle
+  )
+  .action((options: { text?: string; file?: string; to: StringCaseStyle }) => {
+    printValue(convertStringCase(readTextSource(options), options.to));
+  });
+
+str
+  .command("trim")
+  .description("Remove surrounding spaces and newlines.")
+  .option("--text <value>", "Inline text input.")
+  .option("--file <path>", "Read input text from a file.")
+  .action((options: { text?: string; file?: string }) => {
+    printValue(trimText(readTextSource(options)));
+  });
+
+str
+  .command("truncate")
+  .description("Cut text to a maximum length.")
+  .option("--text <value>", "Inline text input.")
+  .option("--file <path>", "Read input text from a file.")
+  .requiredOption("--max <number>", "Maximum length.", parsePositiveInteger)
+  .option("--suffix <value>", "Suffix to append after truncation.")
+  .action(
+    (options: {
+      text?: string;
+      file?: string;
+      max: number;
+      suffix?: string;
+    }) => {
+      printValue(
+        truncateText(readTextSource(options), {
+          max: options.max,
+          ...(options.suffix !== undefined ? { suffix: options.suffix } : {})
+        })
+      );
+    }
+  );
+
+str
+  .command("replace")
+  .description("Replace text fragments or regex matches.")
+  .option("--text <value>", "Inline text input.")
+  .option("--file <path>", "Read input text from a file.")
+  .requiredOption("--from <value>", "Text or regex pattern to replace.")
+  .requiredOption("--with <value>", "Replacement value.")
+  .option("--regex", "Interpret --from as a regex pattern.")
+  .action(
+    (options: {
+      text?: string;
+      file?: string;
+      from: string;
+      with: string;
+      regex?: boolean;
+    }) => {
+      printValue(
+        replaceText(readTextSource(options), {
+          from: options.from,
+          with: options.with,
+          ...(options.regex !== undefined ? { regex: options.regex } : {})
+        })
+      );
+    }
+  );
+
+str
+  .command("normalize")
+  .description("Normalize text using Unicode NFC.")
+  .option("--text <value>", "Inline text input.")
+  .option("--file <path>", "Read input text from a file.")
+  .action((options: { text?: string; file?: string }) => {
+    printValue(normalizeText(readTextSource(options)));
+  });
+
+str
+  .command("remove-accents")
+  .description("Remove accents and diacritics from text.")
+  .option("--text <value>", "Inline text input.")
+  .option("--file <path>", "Read input text from a file.")
+  .action((options: { text?: string; file?: string }) => {
+    printValue(removeAccents(readTextSource(options)));
+  });
+
+str
+  .command("pad")
+  .description("Pad a string with spaces on the left, right or both sides.")
+  .option("--text <value>", "Inline text input.")
+  .option("--file <path>", "Read input text from a file.")
+  .requiredOption(
+    "--length <number>",
+    "Target text length.",
+    parsePositiveInteger
+  )
+  .option(
+    "--side <side>",
+    "Pad direction: left, right or both.",
+    parseStringPadSide,
+    "right"
+  )
+  .action(
+    (options: {
+      text?: string;
+      file?: string;
+      length: number;
+      side: StringPadSide;
+    }) => {
+      printValue(
+        padText(readTextSource(options), {
+          length: options.length,
+          side: options.side
+        })
+      );
+    }
+  );
+
+str
+  .command("extract")
+  .argument("<query>", 'Regex pattern or delimiter pair such as "start|end".')
+  .description("Extract content by regex or by delimiter pairs.")
+  .option("--text <value>", "Inline text input.")
+  .option("--file <path>", "Read input text from a file.")
+  .option("--regex", "Interpret the query as a regex pattern.")
+  .action(
+    (
+      query: string,
+      options: { text?: string; file?: string; regex?: boolean }
+    ) => {
+      printValue(
+        extractText(readTextSource(options), query, {
+          ...(options.regex !== undefined ? { regex: options.regex } : {})
+        })
+      );
+    }
+  );
+
+str
+  .command("base64")
+  .description("Encode or decode Base64 values.")
+  .option("--text <value>", "Inline text input.")
+  .option("--file <path>", "Read input text from a file.")
+  .option(
+    "--mode <mode>",
+    "Use encode or decode mode.",
+    parseStringCodecMode,
+    "encode"
+  )
+  .action(
+    (options: { text?: string; file?: string; mode: StringCodecMode }) => {
+      printValue(transformBase64(readTextSource(options), options.mode));
+    }
+  );
+
+str
+  .command("urlencode")
+  .description("Encode or decode URL-safe content.")
+  .option("--text <value>", "Inline text input.")
+  .option("--file <path>", "Read input text from a file.")
+  .option(
+    "--mode <mode>",
+    "Use encode or decode mode.",
+    parseStringCodecMode,
+    "encode"
+  )
+  .action(
+    (options: { text?: string; file?: string; mode: StringCodecMode }) => {
+      printValue(transformUrlEncoding(readTextSource(options), options.mode));
+    }
+  );
+
+str
+  .command("html")
+  .description("Encode or decode basic HTML entities.")
+  .option("--text <value>", "Inline text input.")
+  .option("--file <path>", "Read input text from a file.")
+  .option(
+    "--mode <mode>",
+    "Use encode or decode mode.",
+    parseStringCodecMode,
+    "encode"
+  )
+  .action(
+    (options: { text?: string; file?: string; mode: StringCodecMode }) => {
+      printValue(transformHtmlEntities(readTextSource(options), options.mode));
+    }
+  );
+
+const jsonCommand = program
+  .command("json")
+  .description("Local JSON formatting, editing and diff helpers.")
+  .addHelpText(
+    "after",
+    `
+Examples:
+  brutils json format --file ./config.json --sort-keys
+  brutils json validate --value '{"ok":true}'
+  brutils json get --file ./config.json --path server.port
+  brutils json set --file ./config.json --path flags.dev --set-value true --in-place
+  brutils json diff --left ./a.json --right ./b.json
+  brutils json merge --file ./base.json ./override.json
+  brutils json to-yaml --value '{"name":"brutils"}'
+`
+  );
+
+jsonCommand
+  .command("format")
+  .description("Pretty-print JSON.")
+  .option("--file <path>", "Read JSON from a file.")
+  .option("--value <json>", "Read JSON inline.")
+  .option(
+    "--indent <number>",
+    "Pretty-print indentation size.",
+    parseInteger,
+    2
+  )
+  .option("--sort-keys", "Sort object keys recursively before printing.")
+  .option("--in-place", "Write the formatted content back to the input file.")
+  .action(
+    (options: {
+      file?: string;
+      value?: string;
+      indent: number;
+      sortKeys?: boolean;
+      inPlace?: boolean;
+    }) => {
+      const source = readSingleJsonSource(options);
+      const result = formatJsonValue(
+        source.parsed,
+        options.indent,
+        options.sortKeys ?? false
+      );
+
+      if (options.inPlace) {
+        if (!source.sourcePath) {
+          throw new Error("--in-place requires --file.");
+        }
+
+        writeTextFile(
+          source.sourcePath,
+          `${result}
+`
+        );
+      }
+
+      printValue(result);
+    }
+  );
+
+jsonCommand
+  .command("minify")
+  .description("Minify JSON.")
+  .option("--file <path>", "Read JSON from a file.")
+  .option("--value <json>", "Read JSON inline.")
+  .option("--in-place", "Write the minified content back to the input file.")
+  .action((options: { file?: string; value?: string; inPlace?: boolean }) => {
+    const source = readSingleJsonSource(options);
+    const result = minifyJsonValue(source.parsed);
+
+    if (options.inPlace) {
+      if (!source.sourcePath) {
+        throw new Error("--in-place requires --file.");
+      }
+
+      writeTextFile(source.sourcePath, result);
+    }
+
+    printValue(result);
+  });
+
+jsonCommand
+  .command("validate")
+  .description("Validate JSON syntax.")
+  .option("--file <path>", "Read JSON from a file.")
+  .option("--value <json>", "Read JSON inline.")
+  .action((options: { file?: string; value?: string }) => {
+    if (options.file && options.value) {
+      throw new Error("Use either --file or --value, not both.");
+    }
+
+    if (!options.file && options.value === undefined) {
+      throw new Error("One of --file or --value is required.");
+    }
+
+    const raw = options.file
+      ? fs.readFileSync(options.file, "utf-8")
+      : options.value!;
+
+    printValue(validateJsonInput(raw));
+  });
+
+jsonCommand
+  .command("get")
+  .description("Read a path from JSON.")
+  .option("--file <path>", "Read JSON from a file.")
+  .option("--value <json>", "Read JSON inline.")
+  .requiredOption("--path <value>", "JSON path to read.")
+  .action((options: { file?: string; value?: string; path: string }) => {
+    const source = readSingleJsonSource(options);
+    printValue(getJsonPathValue(source.parsed, options.path));
+  });
+
+jsonCommand
+  .command("set")
+  .description("Write a path in JSON.")
+  .option("--file <path>", "Read JSON from a file.")
+  .option("--value <json>", "Read JSON inline.")
+  .requiredOption("--path <value>", "JSON path to update.")
+  .requiredOption("--set-value <json>", "New JSON value to write at the path.")
+  .option("--in-place", "Write the updated content back to the input file.")
+  .action(
+    (options: {
+      file?: string;
+      value?: string;
+      path: string;
+      setValue: string;
+      inPlace?: boolean;
+    }) => {
+      const source = readSingleJsonSource(options);
+      const updated = setJsonPathValue(
+        source.parsed,
+        options.path,
+        parseJsonInput(options.setValue)
+      );
+      const formatted = formatJsonValue(updated, 2, false);
+
+      if (options.inPlace) {
+        if (!source.sourcePath) {
+          throw new Error("--in-place requires --file.");
+        }
+
+        writeTextFile(
+          source.sourcePath,
+          `${formatted}
+`
+        );
+      }
+
+      printValue(updated);
+    }
+  );
+
+jsonCommand
+  .command("delete")
+  .description("Remove a path from JSON.")
+  .option("--file <path>", "Read JSON from a file.")
+  .option("--value <json>", "Read JSON inline.")
+  .requiredOption("--path <value>", "JSON path to delete.")
+  .option("--in-place", "Write the updated content back to the input file.")
+  .action(
+    (options: {
+      file?: string;
+      value?: string;
+      path: string;
+      inPlace?: boolean;
+    }) => {
+      const source = readSingleJsonSource(options);
+      const updated = deleteJsonPathValue(source.parsed, options.path);
+      const formatted = formatJsonValue(updated, 2, false);
+
+      if (options.inPlace) {
+        if (!source.sourcePath) {
+          throw new Error("--in-place requires --file.");
+        }
+
+        writeTextFile(
+          source.sourcePath,
+          `${formatted}
+`
+        );
+      }
+
+      printValue(updated);
+    }
+  );
+
+jsonCommand
+  .command("diff")
+  .description("Diff two JSON values or files.")
+  .requiredOption(
+    "--left <source>",
+    "Left JSON file path or inline JSON value."
+  )
+  .requiredOption(
+    "--right <source>",
+    "Right JSON file path or inline JSON value."
+  )
+  .action((options: { left: string; right: string }) => {
+    const result = diffJsonValues(
+      readDiffJsonSource(options.left),
+      readDiffJsonSource(options.right)
+    );
+    printValue(result);
+  });
+
+jsonCommand
+  .command("merge")
+  .description("Merge multiple JSON sources.")
+  .option("--file <paths...>", "Read JSON from one or more files.")
+  .option("--value <json...>", "Read one or more inline JSON values.")
+  .action(
+    (options: { file?: string | string[]; value?: string | string[] }) => {
+      const merged = mergeJsonValues(readMultipleJsonSources(options));
+      printValue(merged);
+    }
+  );
+
+jsonCommand
+  .command("to-yaml")
+  .description("Convert JSON to YAML.")
+  .option("--file <path>", "Read JSON from a file.")
+  .option("--value <json>", "Read JSON inline.")
+  .action((options: { file?: string; value?: string }) => {
+    const source = readSingleJsonSource(options);
+    printValue(convertJsonToYaml(source.parsed));
   });
 
 const randomNumber = program

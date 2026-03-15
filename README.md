@@ -9,6 +9,7 @@ It includes:
 - random integers, floats, picks, shuffles, dice rolls and coin flips
 - number picking with deterministic seeds
 - ZIP creation, archive listing, archive testing and ZIP extraction
+- core text helpers for strings and local JSON manipulation
 
 The project keeps a modular service architecture internally, but now ships with a real CLI entrypoint:
 
@@ -50,6 +51,9 @@ brutils cep mask 86010190 --mask "###**-***"
 brutils credit-card generate --brand visa --formatted
 brutils credit-card detect 4111111111111111
 
+brutils str slug --text "Olá Mundo Legal"
+brutils json format --value '{"name":"brutils","ok":true}' --sort-keys
+
 brutils random-number int --min 1 --max 60 --count 6 --unique --sorted
 brutils random-number pick --items "red,blue,green" --count 2
 
@@ -87,6 +91,29 @@ brutils
 │   ├── generate
 │   ├── validate
 │   └── detect
+├── str
+│   ├── slug
+│   ├── case
+│   ├── trim
+│   ├── truncate
+│   ├── replace
+│   ├── normalize
+│   ├── remove-accents
+│   ├── pad
+│   ├── extract
+│   ├── base64
+│   ├── urlencode
+│   └── html
+├── json
+│   ├── format
+│   ├── minify
+│   ├── validate
+│   ├── get
+│   ├── set
+│   ├── delete
+│   ├── diff
+│   ├── merge
+│   └── to-yaml
 ├── random-number
 │   ├── int
 │   ├── float
@@ -161,6 +188,8 @@ npm run zip:create -- ./dist --out ./artifacts/dist.zip
 - [CNPJ](docs/CNPJ.md)
 - [CEP](docs/CEP.md)
 - [Credit Card](docs/CREDIT_CARD.md)
+- [STR](docs/STR.md)
+- [JSON](docs/JSON.md)
 - [Random Utilities](docs/RANDOM_NUMBER.md)
 - [Number Picker](docs/NUMBER_PICKER.md)
 - [ZIP](docs/ZIP.md)
@@ -183,6 +212,8 @@ scripts/
   credit-card/
   random-number/
   number-picker/
+  str/
+  json/
   zip/
   unzip/
 
@@ -199,7 +230,7 @@ This repository is prepared for three workflow layers:
 
 - **CI** for push and pull request validation
 - **Preview publish** on `main`, producing a `-dev.<run_number>` package version
-- **Release publish** on stable tags like `v0.2.0`
+- **Release publish** on stable tags like `v0.3.0`
 
 The workflows live in `.github/workflows/`.
 
