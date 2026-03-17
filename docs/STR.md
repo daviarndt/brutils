@@ -21,6 +21,7 @@ brutils str extract "\[(.*?)\]" --text "[one] [two]" --regex
 brutils str base64 --text "hello" --mode encode
 brutils str urlencode --text "hello world" --mode encode
 brutils str html --text "<strong>ok</strong>" --mode encode
+brutils str leven "João" "Joao"
 ```
 
 ## Actions

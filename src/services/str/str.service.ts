@@ -273,9 +273,9 @@ export function getLevenshteinDistance(a: string, b: string): number {
       const cost = a[i - 1] === b[j - 1] ? 0 : 1;
 
       dp[i]![j] = Math.min(
-        dp[i - 1]![j]! + 1,          // remoção
-        dp[i]![j - 1]! + 1,         // inserção
-        dp[i - 1]![j - 1]! + cost   // substituição
+        dp[i - 1]![j]! + 1,
+        dp[i]![j - 1]! + 1,
+        dp[i - 1]![j - 1]! + cost
       );
     }
   }
